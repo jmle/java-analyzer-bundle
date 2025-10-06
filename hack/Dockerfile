@@ -5,7 +5,7 @@ RUN dnf module enable -y maven:3.8 \
  && dnf -y install maven-openjdk17 git \
  && dnf clean all
 RUN git clone https://github.com/apache/maven-indexer.git
-RUN cd maven-indexer/indexer-cli && mvn install -Denforcer.skip=true -Dmaven.test.skip=true
+RUN cd maven-indexer && mvn install -Denforcer.skip=true -Dmaven.test.skip=true
 RUN mkdir -p /unpack/index
 COPY export.java /unpack/export.java
 RUN cd /unpack/index \
