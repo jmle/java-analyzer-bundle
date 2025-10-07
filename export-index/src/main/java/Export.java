@@ -21,7 +21,49 @@ public class Export {
     private static String REPOSITORY_URL = "https://repo1.maven.org/maven2";
 
     public static void main(String[] args) throws Exception {
-        Path path = Paths.get(args[0]);
+        if (args.length < 1) {
+            printUsage();
+            System.exit(1);
+        }
+
+        String command = args[0];
+        
+        if ("export".equals(command)) {
+            if (args.length < 2) {
+                System.err.println("Error: export command requires lucene-index-path argument");
+                printUsage();
+                System.exit(1);
+            }
+            exportData(args[1]);
+        } else if ("index".equals(command)) {
+            if (args.length < 3) {
+                System.err.println("Error: index command requires data-file and index-file arguments");
+                printUsage();
+                System.exit(1);
+            }
+            IndexBuilder.buildIndex(args[1], args[2]);
+            System.out.println("Index built successfully!");
+        } else {
+            System.err.println("Error: Unknown command '" + command + "'");
+            printUsage();
+            System.exit(1);
+        }
+    }
+
+    private static void printUsage() {
+        System.err.println("Usage:");
+        System.err.println("  java -jar export-index-1.0-SNAPSHOT.jar export <lucene-index-path>");
+        System.err.println("    - Creates maven.default.index from Lucene index");
+        System.err.println("  java -jar export-index-1.0-SNAPSHOT.jar index <data-file> <index-file>");
+        System.err.println("    - Creates binary search index from data file");
+        System.err.println();
+        System.err.println("Examples:");
+        System.err.println("  java -jar export-index-1.0-SNAPSHOT.jar export /path/to/lucene/index");
+        System.err.println("  java -jar export-index-1.0-SNAPSHOT.jar index maven.default.index maven.default.idx");
+    }
+
+    private static void exportData(String luceneIndexPath) throws Exception {
+        Path path = Paths.get(luceneIndexPath);
         Directory index = FSDirectory.open(path);
         IndexReader reader = DirectoryReader.open(index);
         StoredFields storedFields = reader.storedFields();
@@ -54,6 +96,7 @@ public class Export {
 
         out.close();
         reader.close();
+        System.out.println("Data exported successfully to maven.default.index");
     }
 
     /**

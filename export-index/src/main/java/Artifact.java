@@ -50,6 +50,7 @@ public class Artifact {
     }
 
     public boolean shouldBeIndexed() {
+        // All that we don't need can be filtered out here
         return groupId != null && !classifier.equals("sources") && !classifier.equals("javadocs") && !classifier.equals("tests");
     }
 
